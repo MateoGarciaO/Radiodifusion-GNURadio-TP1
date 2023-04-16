@@ -92,7 +92,7 @@ class TP13(gr.top_block, Qt.QWidget):
         self._Fm_range = Range(500, 1000, 10, 1000, 200)
         self._Fm_win = RangeWidget(self._Fm_range, self.set_Fm, "'Fm'", "counter_slider", float, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._Fm_win)
-        self._Fc_range = Range(5e3, samp_rate/2, 1e3, 10e3, 200)
+        self._Fc_range = Range(5e3, samp_rate/2, 100, 10e3, 200)
         self._Fc_win = RangeWidget(self._Fc_range, self.set_Fc, "'Fc'", "counter_slider", float, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._Fc_win)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
@@ -116,7 +116,7 @@ class TP13(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.enable_stem_plot(False)
 
 
-        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+        labels = ['Mensaje', 'Modulada', 'Signal 3', 'Signal 4', 'Signal 5',
             'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
         widths = [1, 1, 1, 1, 1,
             1, 1, 1, 1, 1]
@@ -166,7 +166,7 @@ class TP13(gr.top_block, Qt.QWidget):
 
         self.qtgui_freq_sink_x_0.set_plot_pos_half(not True)
 
-        labels = ['', '', '', '', '',
+        labels = ['Mensaje', 'Modulada', '', '', '',
             '', '', '', '', '']
         widths = [1, 1, 1, 1, 1,
             1, 1, 1, 1, 1]
@@ -186,30 +186,29 @@ class TP13(gr.top_block, Qt.QWidget):
 
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
-        self.blocks_multiply_xx_0_0 = blocks.multiply_vff(1)
-        self.blocks_multiply_xx_0 = blocks.multiply_vff(1)
-        self.blocks_add_xx_0 = blocks.add_vff(1)
+        self.blocks_multiply_xx_0_1_0 = blocks.multiply_vff(1)
+        self.blocks_multiply_xx_0_1 = blocks.multiply_vff(1)
+        self.blocks_add_xx_0_0 = blocks.add_vff(1)
         self.analog_sig_source_x_0_0 = analog.sig_source_f(samp_rate, analog.GR_COS_WAVE, Fc, (1/m), 0, 0)
         self.analog_sig_source_x_0_0.set_block_alias("Portadora")
         self.analog_sig_source_x_0 = analog.sig_source_f(samp_rate, analog.GR_SIN_WAVE, Fm, 1, 0, 0)
         self.analog_sig_source_x_0.set_block_alias("Mensaje")
-        self.analog_const_source_x_0_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, m)
-        self.analog_const_source_x_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, 1)
+        self.analog_const_source_x_0_0_0 = analog.sig_source_f(0, analog.GR_CONST_WAVE, 0, 0, (1/m))
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_const_source_x_0, 0), (self.blocks_add_xx_0, 1))
-        self.connect((self.analog_const_source_x_0_0, 0), (self.blocks_multiply_xx_0, 1))
-        self.connect((self.analog_sig_source_x_0, 0), (self.blocks_multiply_xx_0, 0))
+        self.connect((self.analog_const_source_x_0_0_0, 0), (self.blocks_multiply_xx_0_1, 1))
+        self.connect((self.analog_sig_source_x_0, 0), (self.blocks_multiply_xx_0_1_0, 0))
         self.connect((self.analog_sig_source_x_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.analog_sig_source_x_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.analog_sig_source_x_0_0, 0), (self.blocks_multiply_xx_0_0, 1))
-        self.connect((self.blocks_add_xx_0, 0), (self.blocks_multiply_xx_0_0, 0))
-        self.connect((self.blocks_multiply_xx_0, 0), (self.blocks_add_xx_0, 0))
-        self.connect((self.blocks_multiply_xx_0_0, 0), (self.qtgui_freq_sink_x_0, 1))
-        self.connect((self.blocks_multiply_xx_0_0, 0), (self.qtgui_time_sink_x_0, 1))
+        self.connect((self.analog_sig_source_x_0_0, 0), (self.blocks_multiply_xx_0_1, 0))
+        self.connect((self.analog_sig_source_x_0_0, 0), (self.blocks_multiply_xx_0_1_0, 1))
+        self.connect((self.blocks_add_xx_0_0, 0), (self.qtgui_freq_sink_x_0, 1))
+        self.connect((self.blocks_add_xx_0_0, 0), (self.qtgui_time_sink_x_0, 1))
+        self.connect((self.blocks_multiply_xx_0_1, 0), (self.blocks_add_xx_0_0, 1))
+        self.connect((self.blocks_multiply_xx_0_1_0, 0), (self.blocks_add_xx_0_0, 0))
 
 
     def closeEvent(self, event):
@@ -235,7 +234,7 @@ class TP13(gr.top_block, Qt.QWidget):
 
     def set_m(self, m):
         self.m = m
-        self.analog_const_source_x_0_0.set_offset(self.m)
+        self.analog_const_source_x_0_0_0.set_offset((1/self.m))
         self.analog_sig_source_x_0_0.set_amplitude((1/self.m))
 
     def get_Fm(self):

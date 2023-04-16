@@ -33,11 +33,23 @@ options:
     state: enabled
 
 blocks:
+- name: min_fase
+  id: variable
+  parameters:
+    comment: ''
+    value: (np.pi*2*(1e6+1e3)/samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [288, 36.0]
+    rotation: 0
+    state: enabled
 - name: samp_rate
   id: variable
   parameters:
     comment: ''
-    value: 100e3
+    value: 256e3
   states:
     bus_sink: false
     bus_source: false
@@ -50,21 +62,21 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    comment: ''
-    max_freq: 1e7
+    comment: "Detecta la portadora y me devuelve \nla portadora por la se\xF1al"
+    max_freq: -min_fase
     maxoutbuf: '0'
-    min_freq: 1e5
+    min_freq: min_fase
     minoutbuf: '0'
     w: '0.04'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [400, 244.0]
+    coordinate: [576, 316.0]
     rotation: 0
     state: true
-- name: blocks_complex_to_mag_0
-  id: blocks_complex_to_mag
+- name: blocks_complex_to_float_0
+  id: blocks_complex_to_float
   parameters:
     affinity: ''
     alias: ''
@@ -76,23 +88,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1056, 328.0]
-    rotation: 0
-    state: true
-- name: blocks_complex_to_mag_0_0
-  id: blocks_complex_to_mag
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [384, 192.0]
+    coordinate: [824, 320.0]
     rotation: 0
     state: true
 - name: blocks_file_source_0
@@ -108,17 +104,51 @@ blocks:
     minoutbuf: '0'
     offset: '0'
     repeat: 'True'
-    type: complex
+    type: float
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [128, 284.0]
+    coordinate: [48, 284.0]
     rotation: 0
     state: true
-- name: blocks_multiply_xx_0
-  id: blocks_multiply_xx
+- name: blocks_float_to_complex_0
+  id: blocks_float_to_complex
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [352, 320.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: La amplifico xq sale muy atenuada
+    const: '5'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1536, 308.0]
+    rotation: 0
+    state: true
+- name: blocks_sub_xx_0
+  id: blocks_sub_xx
   parameters:
     affinity: ''
     alias: ''
@@ -126,16 +156,53 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     num_inputs: '2'
-    type: complex
+    type: float
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [632, 320.0]
+    coordinate: [1384, 296.0]
     rotation: 0
     state: true
-- name: low_pass_filter_0
+- name: import_0
+  id: import
+  parameters:
+    alias: ''
+    comment: ''
+    imports: import numpy as np
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [416, 44.0]
+    rotation: 0
+    state: true
+- name: low_pass_filter_0_0
+  id: low_pass_filter
+  parameters:
+    affinity: ''
+    alias: ''
+    beta: '6.76'
+    comment: Componente Continua
+    cutoff_freq: '100'
+    decim: '1'
+    gain: '1'
+    interp: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    type: interp_fir_filter_fff
+    width: '100'
+    win: window.WIN_HAMMING
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1152, 68.0]
+    rotation: 0
+    state: enabled
+- name: low_pass_filter_1
   id: low_pass_filter
   parameters:
     affinity: ''
@@ -149,14 +216,14 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     samp_rate: samp_rate
-    type: interp_fir_filter_ccf
+    type: interp_fir_filter_fff
     width: '100'
     win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [792, 284.0]
+    coordinate: [1016, 268.0]
     rotation: 0
     state: true
 - name: qtgui_freq_sink_x_0
@@ -194,7 +261,7 @@ blocks:
     fftsize: '1024'
     freqhalf: 'True'
     grid: 'False'
-    gui_hint: ''
+    gui_hint: (0,0)
     label: Relative Gain
     label1: Modulada
     label10: ''''''
@@ -237,7 +304,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1272, 100.0]
+    coordinate: [1720, 188.0]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -271,7 +338,7 @@ blocks:
     ctrlpanel: 'True'
     entags: 'True'
     grid: 'True'
-    gui_hint: ''
+    gui_hint: (1,0)
     label1: "Se\xF1al Modulada"
     label10: Signal 10
     label2: "Se\xF1al Demodulada"
@@ -334,21 +401,23 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1272, 196.0]
+    coordinate: [1696, 420.0]
     rotation: 0
     state: true
 
 connections:
-- [analog_pll_carriertracking_cc_0, '0', blocks_multiply_xx_0, '0']
-- [blocks_complex_to_mag_0, '0', qtgui_freq_sink_x_0, '1']
-- [blocks_complex_to_mag_0, '0', qtgui_time_sink_x_0, '1']
-- [blocks_complex_to_mag_0_0, '0', qtgui_freq_sink_x_0, '0']
-- [blocks_complex_to_mag_0_0, '0', qtgui_time_sink_x_0, '0']
-- [blocks_file_source_0, '0', analog_pll_carriertracking_cc_0, '0']
-- [blocks_file_source_0, '0', blocks_complex_to_mag_0_0, '0']
-- [blocks_file_source_0, '0', blocks_multiply_xx_0, '1']
-- [blocks_multiply_xx_0, '0', low_pass_filter_0, '0']
-- [low_pass_filter_0, '0', blocks_complex_to_mag_0, '0']
+- [analog_pll_carriertracking_cc_0, '0', blocks_complex_to_float_0, '0']
+- [blocks_complex_to_float_0, '0', low_pass_filter_1, '0']
+- [blocks_file_source_0, '0', blocks_float_to_complex_0, '0']
+- [blocks_file_source_0, '0', qtgui_freq_sink_x_0, '0']
+- [blocks_file_source_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_float_to_complex_0, '0', analog_pll_carriertracking_cc_0, '0']
+- [blocks_multiply_const_vxx_0, '0', qtgui_freq_sink_x_0, '1']
+- [blocks_multiply_const_vxx_0, '0', qtgui_time_sink_x_0, '1']
+- [blocks_sub_xx_0, '0', blocks_multiply_const_vxx_0, '0']
+- [low_pass_filter_0_0, '0', blocks_sub_xx_0, '0']
+- [low_pass_filter_1, '0', blocks_sub_xx_0, '1']
+- [low_pass_filter_1, '0', low_pass_filter_0_0, '0']
 
 metadata:
   file_format: 1

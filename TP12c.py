@@ -36,6 +36,7 @@ import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
+import numpy as np
 
 
 
@@ -77,7 +78,8 @@ class TP12c(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 100e3
+        self.samp_rate = samp_rate = 256e3
+        self.min_fase = min_fase = (np.pi*2*(1e6+1e3)/samp_rate)
 
         ##################################################
         # Blocks
@@ -130,7 +132,11 @@ class TP12c(gr.top_block, Qt.QWidget):
             self.qtgui_time_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_win, 1, 0, 1, 1)
+        for r in range(1, 2):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_f(
             1024, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
@@ -173,8 +179,12 @@ class TP12c(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
-        self.low_pass_filter_0 = filter.interp_fir_filter_ccf(
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_win, 0, 0, 1, 1)
+        for r in range(0, 1):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
+        self.low_pass_filter_1 = filter.interp_fir_filter_fff(
             1,
             firdes.low_pass(
                 1,
@@ -183,27 +193,39 @@ class TP12c(gr.top_block, Qt.QWidget):
                 100,
                 window.WIN_HAMMING,
                 6.76))
-        self.blocks_multiply_xx_0 = blocks.multiply_vcc(1)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_gr_complex*1, '/home/mateo/Desktop/Link to UCA/Radiodifusion/Ejercicios/TP1GNU/TP1-2a-AM.bin', True, 0, 0)
+        self.low_pass_filter_0_0 = filter.interp_fir_filter_fff(
+            1,
+            firdes.low_pass(
+                1,
+                samp_rate,
+                100,
+                100,
+                window.WIN_HAMMING,
+                6.76))
+        self.blocks_sub_xx_0 = blocks.sub_ff(1)
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_ff(5)
+        self.blocks_float_to_complex_0 = blocks.float_to_complex(1)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_float*1, '/home/mateo/Desktop/Link to UCA/Radiodifusion/Ejercicios/TP1GNU/TP1-2a-AM.bin', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
-        self.blocks_complex_to_mag_0_0 = blocks.complex_to_mag(1)
-        self.blocks_complex_to_mag_0 = blocks.complex_to_mag(1)
-        self.analog_pll_carriertracking_cc_0 = analog.pll_carriertracking_cc(0.04, 1e7, 1e5)
+        self.blocks_complex_to_float_0 = blocks.complex_to_float(1)
+        self.analog_pll_carriertracking_cc_0 = analog.pll_carriertracking_cc(0.04, (-min_fase), min_fase)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_pll_carriertracking_cc_0, 0), (self.blocks_multiply_xx_0, 0))
-        self.connect((self.blocks_complex_to_mag_0, 0), (self.qtgui_freq_sink_x_0, 1))
-        self.connect((self.blocks_complex_to_mag_0, 0), (self.qtgui_time_sink_x_0, 1))
-        self.connect((self.blocks_complex_to_mag_0_0, 0), (self.qtgui_freq_sink_x_0, 0))
-        self.connect((self.blocks_complex_to_mag_0_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.analog_pll_carriertracking_cc_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_complex_to_mag_0_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_multiply_xx_0, 1))
-        self.connect((self.blocks_multiply_xx_0, 0), (self.low_pass_filter_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_complex_to_mag_0, 0))
+        self.connect((self.analog_pll_carriertracking_cc_0, 0), (self.blocks_complex_to_float_0, 0))
+        self.connect((self.blocks_complex_to_float_0, 0), (self.low_pass_filter_1, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.blocks_float_to_complex_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_float_to_complex_0, 0), (self.analog_pll_carriertracking_cc_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.qtgui_freq_sink_x_0, 1))
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.qtgui_time_sink_x_0, 1))
+        self.connect((self.blocks_sub_xx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_sub_xx_0, 0))
+        self.connect((self.low_pass_filter_1, 0), (self.blocks_sub_xx_0, 1))
+        self.connect((self.low_pass_filter_1, 0), (self.low_pass_filter_0_0, 0))
 
 
     def closeEvent(self, event):
@@ -219,9 +241,19 @@ class TP12c(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 1e3, 100, window.WIN_HAMMING, 6.76))
+        self.set_min_fase((np.pi*2*(1e6+1e3)/self.samp_rate))
+        self.low_pass_filter_0_0.set_taps(firdes.low_pass(1, self.samp_rate, 100, 100, window.WIN_HAMMING, 6.76))
+        self.low_pass_filter_1.set_taps(firdes.low_pass(1, self.samp_rate, 1e3, 100, window.WIN_HAMMING, 6.76))
         self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
+
+    def get_min_fase(self):
+        return self.min_fase
+
+    def set_min_fase(self, min_fase):
+        self.min_fase = min_fase
+        self.analog_pll_carriertracking_cc_0.set_max_freq((-self.min_fase))
+        self.analog_pll_carriertracking_cc_0.set_min_freq(self.min_fase)
 
 
 

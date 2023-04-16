@@ -35,8 +35,6 @@ import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
-from gnuradio.qtgui import Range, RangeWidget
-from PyQt5 import QtCore
 
 
 
@@ -78,8 +76,7 @@ class TP12d(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 32000
-        self.ganancia = ganancia = 1
+        self.samp_rate = samp_rate = 256e3
 
         ##################################################
         # Blocks
@@ -133,50 +130,7 @@ class TP12d(gr.top_block, Qt.QWidget):
 
         self._qtgui_time_sink_x_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_0_win)
-        self.qtgui_freq_sink_x_1 = qtgui.freq_sink_f(
-            1024, #size
-            window.WIN_BLACKMAN_hARRIS, #wintype
-            0, #fc
-            samp_rate, #bw
-            "", #name
-            1,
-            None # parent
-        )
-        self.qtgui_freq_sink_x_1.set_update_time(0.10)
-        self.qtgui_freq_sink_x_1.set_y_axis((-140), 10)
-        self.qtgui_freq_sink_x_1.set_y_label('Relative Gain', 'dB')
-        self.qtgui_freq_sink_x_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
-        self.qtgui_freq_sink_x_1.enable_autoscale(False)
-        self.qtgui_freq_sink_x_1.enable_grid(False)
-        self.qtgui_freq_sink_x_1.set_fft_average(1.0)
-        self.qtgui_freq_sink_x_1.enable_axis_labels(True)
-        self.qtgui_freq_sink_x_1.enable_control_panel(False)
-        self.qtgui_freq_sink_x_1.set_fft_window_normalized(False)
-
-
-        self.qtgui_freq_sink_x_1.set_plot_pos_half(not True)
-
-        labels = ['', '', '', '', '',
-            '', '', '', '', '']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ["blue", "red", "green", "black", "cyan",
-            "magenta", "yellow", "dark red", "dark green", "dark blue"]
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
-
-        for i in range(1):
-            if len(labels[i]) == 0:
-                self.qtgui_freq_sink_x_1.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_freq_sink_x_1.set_line_label(i, labels[i])
-            self.qtgui_freq_sink_x_1.set_line_width(i, widths[i])
-            self.qtgui_freq_sink_x_1.set_line_color(i, colors[i])
-            self.qtgui_freq_sink_x_1.set_line_alpha(i, alphas[i])
-
-        self._qtgui_freq_sink_x_1_win = sip.wrapinstance(self.qtgui_freq_sink_x_1.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_1_win)
-        self.qtgui_freq_sink_x_0 = qtgui.freq_sink_f(
+        self.qtgui_freq_sink_x_0_0 = qtgui.freq_sink_f(
             1024, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
             0, #fc
@@ -185,19 +139,19 @@ class TP12d(gr.top_block, Qt.QWidget):
             2,
             None # parent
         )
-        self.qtgui_freq_sink_x_0.set_update_time(0.10)
-        self.qtgui_freq_sink_x_0.set_y_axis((-140), 10)
-        self.qtgui_freq_sink_x_0.set_y_label('Relative Gain', 'dB')
-        self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
-        self.qtgui_freq_sink_x_0.enable_autoscale(False)
-        self.qtgui_freq_sink_x_0.enable_grid(False)
-        self.qtgui_freq_sink_x_0.set_fft_average(1.0)
-        self.qtgui_freq_sink_x_0.enable_axis_labels(True)
-        self.qtgui_freq_sink_x_0.enable_control_panel(False)
-        self.qtgui_freq_sink_x_0.set_fft_window_normalized(False)
+        self.qtgui_freq_sink_x_0_0.set_update_time(0.10)
+        self.qtgui_freq_sink_x_0_0.set_y_axis((-140), 10)
+        self.qtgui_freq_sink_x_0_0.set_y_label('Relative Gain', 'dB')
+        self.qtgui_freq_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
+        self.qtgui_freq_sink_x_0_0.enable_autoscale(False)
+        self.qtgui_freq_sink_x_0_0.enable_grid(False)
+        self.qtgui_freq_sink_x_0_0.set_fft_average(1.0)
+        self.qtgui_freq_sink_x_0_0.enable_axis_labels(True)
+        self.qtgui_freq_sink_x_0_0.enable_control_panel(False)
+        self.qtgui_freq_sink_x_0_0.set_fft_window_normalized(False)
 
 
-        self.qtgui_freq_sink_x_0.set_plot_pos_half(not True)
+        self.qtgui_freq_sink_x_0_0.set_plot_pos_half(not True)
 
         labels = ['Modulada', 'Demodulada', '', '', '',
             '', '', '', '', '']
@@ -210,15 +164,19 @@ class TP12d(gr.top_block, Qt.QWidget):
 
         for i in range(2):
             if len(labels[i]) == 0:
-                self.qtgui_freq_sink_x_0.set_line_label(i, "Data {0}".format(i))
+                self.qtgui_freq_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
             else:
-                self.qtgui_freq_sink_x_0.set_line_label(i, labels[i])
-            self.qtgui_freq_sink_x_0.set_line_width(i, widths[i])
-            self.qtgui_freq_sink_x_0.set_line_color(i, colors[i])
-            self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
+                self.qtgui_freq_sink_x_0_0.set_line_label(i, labels[i])
+            self.qtgui_freq_sink_x_0_0.set_line_width(i, widths[i])
+            self.qtgui_freq_sink_x_0_0.set_line_color(i, colors[i])
+            self.qtgui_freq_sink_x_0_0.set_line_alpha(i, alphas[i])
 
-        self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self._qtgui_freq_sink_x_0_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0_0.qwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_0_win, 2, 0, 1, 1)
+        for r in range(2, 3):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.low_pass_filter_0_1 = filter.interp_fir_filter_fff(
             1,
             firdes.low_pass(
@@ -228,49 +186,89 @@ class TP12d(gr.top_block, Qt.QWidget):
                 100,
                 window.WIN_HAMMING,
                 6.76))
-        self.low_pass_filter_0_0 = filter.interp_fir_filter_fff(
+        self.low_pass_filter_0_0_0 = filter.interp_fir_filter_fff(
             1,
             firdes.low_pass(
                 1,
                 samp_rate,
-                10,
-                1,
+                100,
+                100,
                 window.WIN_HAMMING,
                 6.76))
-        self._ganancia_range = Range(0, 100, 1, 1, 200)
-        self._ganancia_win = RangeWidget(self._ganancia_range, self.set_ganancia, "'ganancia'", "counter_slider", float, QtCore.Qt.Horizontal)
-        self.top_layout.addWidget(self._ganancia_win)
-        self.blocks_sub_xx_1_0 = blocks.sub_ff(1)
+        self.blocks_sub_xx_1 = blocks.sub_ff(1)
         self.blocks_sub_xx_0_0 = blocks.sub_ff(1)
-        self.blocks_null_source_0_0 = blocks.null_source(gr.sizeof_float*1)
-        self.blocks_null_source_0 = blocks.null_source(gr.sizeof_float*1)
-        self.blocks_max_xx_0_0_0 = blocks.max_ff(1, 1)
-        self.blocks_max_xx_0_0 = blocks.max_ff(1, 1)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_float*1, '/home/mateo/Desktop/Link to UCA/Radiodifusion/Ejercicios/TP1GNU/TP1-2a-AM.bin', True, 0, 0)
-        self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
-        self.blocks_divide_xx_0_0 = blocks.divide_ff(1)
+        self.blocks_sample_and_hold_xx_0_1 = blocks.sample_and_hold_ff()
+        self.blocks_sample_and_hold_xx_0_0 = blocks.sample_and_hold_ff()
+        self.blocks_peak_detector_xb_0 = blocks.peak_detector_fb(1, 1, 1000, 0.001)
+        self.blocks_peak_detector2_fb_0_0 = blocks.peak_detector2_fb(7, 1000, 0.001)
+        self.blocks_float_to_complex_0_0 = blocks.float_to_complex(1)
+        self.blocks_file_source_0_0 = blocks.file_source(gr.sizeof_float*1, '/home/mateo/Desktop/Link to UCA/Radiodifusion/Ejercicios/TP1GNU/TP1-2a-AM.bin', True, 0, 0)
+        self.blocks_file_source_0_0.set_begin_tag(pmt.PMT_NIL)
+        self.blocks_divide_xx_0 = blocks.divide_ff(1)
+        self.blocks_complex_to_mag_0_0 = blocks.complex_to_mag(1)
+        self.CoefMod = qtgui.number_sink(
+            gr.sizeof_float,
+            0,
+            qtgui.NUM_GRAPH_HORIZ,
+            1,
+            None # parent
+        )
+        self.CoefMod.set_update_time(0.10)
+        self.CoefMod.set_title("")
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        units = ['', '', '', '', '',
+            '', '', '', '', '']
+        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
+            ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
+        factor = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+
+        for i in range(1):
+            self.CoefMod.set_min(i, -1)
+            self.CoefMod.set_max(i, 1)
+            self.CoefMod.set_color(i, colors[i][0], colors[i][1])
+            if len(labels[i]) == 0:
+                self.CoefMod.set_label(i, "Data {0}".format(i))
+            else:
+                self.CoefMod.set_label(i, labels[i])
+            self.CoefMod.set_unit(i, units[i])
+            self.CoefMod.set_factor(i, factor[i])
+
+        self.CoefMod.enable_autoscale(True)
+        self._CoefMod_win = sip.wrapinstance(self.CoefMod.qwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._CoefMod_win, 0, 0, 1, 1)
+        for r in range(0, 1):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_divide_xx_0_0, 0), (self.qtgui_freq_sink_x_1, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.low_pass_filter_0_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.low_pass_filter_0_1, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.qtgui_time_sink_x_0_0, 0))
-        self.connect((self.blocks_max_xx_0_0, 0), (self.blocks_sub_xx_1_0, 0))
-        self.connect((self.blocks_max_xx_0_0_0, 0), (self.blocks_sub_xx_1_0, 1))
-        self.connect((self.blocks_null_source_0, 0), (self.blocks_max_xx_0_0_0, 1))
-        self.connect((self.blocks_null_source_0_0, 0), (self.blocks_max_xx_0_0, 1))
-        self.connect((self.blocks_sub_xx_0_0, 0), (self.qtgui_freq_sink_x_0, 1))
+        self.connect((self.blocks_complex_to_mag_0_0, 0), (self.low_pass_filter_0_1, 0))
+        self.connect((self.blocks_divide_xx_0, 0), (self.CoefMod, 0))
+        self.connect((self.blocks_file_source_0_0, 0), (self.blocks_float_to_complex_0_0, 0))
+        self.connect((self.blocks_file_source_0_0, 0), (self.qtgui_freq_sink_x_0_0, 0))
+        self.connect((self.blocks_file_source_0_0, 0), (self.qtgui_time_sink_x_0_0, 0))
+        self.connect((self.blocks_float_to_complex_0_0, 0), (self.blocks_complex_to_mag_0_0, 0))
+        self.connect((self.blocks_peak_detector2_fb_0_0, 0), (self.blocks_sample_and_hold_xx_0_0, 1))
+        self.connect((self.blocks_peak_detector_xb_0, 0), (self.blocks_sample_and_hold_xx_0_1, 1))
+        self.connect((self.blocks_sample_and_hold_xx_0_0, 0), (self.blocks_sub_xx_1, 0))
+        self.connect((self.blocks_sample_and_hold_xx_0_1, 0), (self.blocks_divide_xx_0, 1))
+        self.connect((self.blocks_sample_and_hold_xx_0_1, 0), (self.blocks_sub_xx_1, 1))
+        self.connect((self.blocks_sub_xx_0_0, 0), (self.qtgui_freq_sink_x_0_0, 1))
         self.connect((self.blocks_sub_xx_0_0, 0), (self.qtgui_time_sink_x_0_0, 1))
-        self.connect((self.blocks_sub_xx_1_0, 0), (self.blocks_divide_xx_0_0, 1))
-        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_divide_xx_0_0, 0))
-        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_max_xx_0_0_0, 0))
-        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_sub_xx_0_0, 1))
-        self.connect((self.low_pass_filter_0_1, 0), (self.blocks_max_xx_0_0, 0))
-        self.connect((self.low_pass_filter_0_1, 0), (self.blocks_sub_xx_0_0, 0))
+        self.connect((self.blocks_sub_xx_1, 0), (self.blocks_divide_xx_0, 0))
+        self.connect((self.low_pass_filter_0_0_0, 0), (self.blocks_peak_detector_xb_0, 0))
+        self.connect((self.low_pass_filter_0_0_0, 0), (self.blocks_sample_and_hold_xx_0_1, 0))
+        self.connect((self.low_pass_filter_0_0_0, 0), (self.blocks_sub_xx_0_0, 0))
+        self.connect((self.low_pass_filter_0_1, 0), (self.blocks_peak_detector2_fb_0_0, 0))
+        self.connect((self.low_pass_filter_0_1, 0), (self.blocks_sample_and_hold_xx_0_0, 0))
+        self.connect((self.low_pass_filter_0_1, 0), (self.blocks_sub_xx_0_0, 1))
+        self.connect((self.low_pass_filter_0_1, 0), (self.low_pass_filter_0_0_0, 0))
 
 
     def closeEvent(self, event):
@@ -286,17 +284,10 @@ class TP12d(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.low_pass_filter_0_0.set_taps(firdes.low_pass(1, self.samp_rate, 10, 1, window.WIN_HAMMING, 6.76))
+        self.low_pass_filter_0_0_0.set_taps(firdes.low_pass(1, self.samp_rate, 100, 100, window.WIN_HAMMING, 6.76))
         self.low_pass_filter_0_1.set_taps(firdes.low_pass(1, self.samp_rate, 1e3, 100, window.WIN_HAMMING, 6.76))
-        self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
-        self.qtgui_freq_sink_x_1.set_frequency_range(0, self.samp_rate)
+        self.qtgui_freq_sink_x_0_0.set_frequency_range(0, self.samp_rate)
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
-
-    def get_ganancia(self):
-        return self.ganancia
-
-    def set_ganancia(self, ganancia):
-        self.ganancia = ganancia
 
 
 

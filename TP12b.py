@@ -76,7 +76,7 @@ class TP12b(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 100e3
+        self.samp_rate = samp_rate = 256e3
 
         ##################################################
         # Blocks
@@ -129,7 +129,11 @@ class TP12b(gr.top_block, Qt.QWidget):
             self.qtgui_time_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_win, 1, 0, 1, 1)
+        for r in range(1, 2):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_f(
             1024, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
@@ -172,14 +176,18 @@ class TP12b(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_win, 0, 0, 1, 1)
+        for r in range(0, 1):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.low_pass_filter_0_0 = filter.interp_fir_filter_fff(
             1,
             firdes.low_pass(
                 1,
                 samp_rate,
-                10,
-                1,
+                100,
+                100,
                 window.WIN_HAMMING,
                 6.76))
         self.low_pass_filter_0 = filter.interp_fir_filter_fff(
@@ -192,21 +200,25 @@ class TP12b(gr.top_block, Qt.QWidget):
                 window.WIN_HAMMING,
                 6.76))
         self.blocks_sub_xx_0 = blocks.sub_ff(1)
+        self.blocks_float_to_complex_0 = blocks.float_to_complex(1)
         self.blocks_file_source_0 = blocks.file_source(gr.sizeof_float*1, '/home/mateo/Desktop/Link to UCA/Radiodifusion/Ejercicios/TP1GNU/TP1-2a-AM.bin', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
+        self.blocks_complex_to_mag_0 = blocks.complex_to_mag(1)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_file_source_0, 0), (self.low_pass_filter_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.low_pass_filter_0_0, 0))
+        self.connect((self.blocks_complex_to_mag_0, 0), (self.low_pass_filter_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.blocks_float_to_complex_0, 0))
         self.connect((self.blocks_file_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.blocks_file_source_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_float_to_complex_0, 0), (self.blocks_complex_to_mag_0, 0))
         self.connect((self.blocks_sub_xx_0, 0), (self.qtgui_freq_sink_x_0, 1))
         self.connect((self.blocks_sub_xx_0, 0), (self.qtgui_time_sink_x_0, 1))
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_sub_xx_0, 0))
-        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_sub_xx_0, 1))
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_sub_xx_0, 1))
+        self.connect((self.low_pass_filter_0, 0), (self.low_pass_filter_0_0, 0))
+        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_sub_xx_0, 0))
 
 
     def closeEvent(self, event):
@@ -223,7 +235,7 @@ class TP12b(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 1e3, 100, window.WIN_HAMMING, 6.76))
-        self.low_pass_filter_0_0.set_taps(firdes.low_pass(1, self.samp_rate, 10, 1, window.WIN_HAMMING, 6.76))
+        self.low_pass_filter_0_0.set_taps(firdes.low_pass(1, self.samp_rate, 100, 100, window.WIN_HAMMING, 6.76))
         self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
 

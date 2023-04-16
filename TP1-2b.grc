@@ -37,14 +37,30 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 100e3
+    value: 256e3
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 12]
+    coordinate: [184, 12.0]
     rotation: 0
     state: enabled
+- name: blocks_complex_to_mag_0
+  id: blocks_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Detector de envolvente
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [448, 216.0]
+    rotation: 0
+    state: true
 - name: blocks_file_source_0
   id: blocks_file_source
   parameters:
@@ -64,7 +80,23 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [104, 204.0]
+    coordinate: [8, 164.0]
+    rotation: 0
+    state: true
+- name: blocks_float_to_complex_0
+  id: blocks_float_to_complex
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [256, 200.0]
     rotation: 0
     state: true
 - name: blocks_sub_xx_0
@@ -82,7 +114,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [576, 296.0]
+    coordinate: [1064, 168.0]
     rotation: 0
     state: true
 - name: low_pass_filter_0
@@ -106,7 +138,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [344, 188.0]
+    coordinate: [632, 148.0]
     rotation: 0
     state: enabled
 - name: low_pass_filter_0_0
@@ -115,8 +147,8 @@ blocks:
     affinity: ''
     alias: ''
     beta: '6.76'
-    comment: ''
-    cutoff_freq: '10'
+    comment: Componente Continua
+    cutoff_freq: '100'
     decim: '1'
     gain: '1'
     interp: '1'
@@ -124,13 +156,13 @@ blocks:
     minoutbuf: '0'
     samp_rate: samp_rate
     type: interp_fir_filter_fff
-    width: '1'
+    width: '100'
     win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [344, 332.0]
+    coordinate: [848, 20.0]
     rotation: 0
     state: enabled
 - name: qtgui_freq_sink_x_0
@@ -168,7 +200,7 @@ blocks:
     fftsize: '1024'
     freqhalf: 'True'
     grid: 'False'
-    gui_hint: ''
+    gui_hint: (0,0)
     label: Relative Gain
     label1: Modulada
     label10: ''''''
@@ -211,7 +243,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [744, 44.0]
+    coordinate: [1288, 4.0]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -245,7 +277,7 @@ blocks:
     ctrlpanel: 'True'
     entags: 'True'
     grid: 'True'
-    gui_hint: ''
+    gui_hint: (1,0)
     label1: Modulada
     label10: Signal 10
     label2: Demodulada
@@ -308,19 +340,61 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [744, 132.0]
+    coordinate: [1280, 276.0]
+    rotation: 0
+    state: true
+- name: virtual_sink_0
+  id: virtual_sink
+  parameters:
+    alias: ''
+    comment: ''
+    stream_id: Modulada
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [264, 148.0]
+    rotation: 0
+    state: true
+- name: virtual_source_0
+  id: virtual_source
+  parameters:
+    alias: ''
+    comment: ''
+    stream_id: Modulada
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1072, 4.0]
+    rotation: 0
+    state: true
+- name: virtual_source_0_0
+  id: virtual_source
+  parameters:
+    alias: ''
+    comment: ''
+    stream_id: Modulada
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 276.0]
     rotation: 0
     state: true
 
 connections:
-- [blocks_file_source_0, '0', low_pass_filter_0, '0']
-- [blocks_file_source_0, '0', low_pass_filter_0_0, '0']
-- [blocks_file_source_0, '0', qtgui_freq_sink_x_0, '0']
-- [blocks_file_source_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_complex_to_mag_0, '0', low_pass_filter_0, '0']
+- [blocks_file_source_0, '0', blocks_float_to_complex_0, '0']
+- [blocks_file_source_0, '0', virtual_sink_0, '0']
+- [blocks_float_to_complex_0, '0', blocks_complex_to_mag_0, '0']
 - [blocks_sub_xx_0, '0', qtgui_freq_sink_x_0, '1']
 - [blocks_sub_xx_0, '0', qtgui_time_sink_x_0, '1']
-- [low_pass_filter_0, '0', blocks_sub_xx_0, '0']
-- [low_pass_filter_0_0, '0', blocks_sub_xx_0, '1']
+- [low_pass_filter_0, '0', blocks_sub_xx_0, '1']
+- [low_pass_filter_0, '0', low_pass_filter_0_0, '0']
+- [low_pass_filter_0_0, '0', blocks_sub_xx_0, '0']
+- [virtual_source_0, '0', qtgui_freq_sink_x_0, '0']
+- [virtual_source_0_0, '0', qtgui_time_sink_x_0, '0']
 
 metadata:
   file_format: 1

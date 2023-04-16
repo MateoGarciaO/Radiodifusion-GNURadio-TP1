@@ -34,6 +34,8 @@ import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
+from gnuradio.qtgui import Range, RangeWidget
+from PyQt5 import QtCore
 
 
 
@@ -76,11 +78,15 @@ class TP11b(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 32000
+        self.fm = fm = 5e3
 
         ##################################################
         # Blocks
         ##################################################
 
+        self._fm_range = Range(0, 15e3, 1, 5e3, 200)
+        self._fm_win = RangeWidget(self._fm_range, self.set_fm, "'fm'", "counter_slider", float, QtCore.Qt.Horizontal)
+        self.top_layout.addWidget(self._fm_win)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
             1024, #size
             samp_rate, #samp_rate
@@ -173,7 +179,7 @@ class TP11b(gr.top_block, Qt.QWidget):
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate,True)
-        self.analog_sig_source_x_0 = analog.sig_source_f(samp_rate, analog.GR_COS_WAVE, 10e3, 1, 0, 0)
+        self.analog_sig_source_x_0 = analog.sig_source_f(samp_rate, analog.GR_COS_WAVE, fm, 1, 0, 0)
 
 
         ##################################################
@@ -201,6 +207,13 @@ class TP11b(gr.top_block, Qt.QWidget):
         self.blocks_throttle_0.set_sample_rate(self.samp_rate)
         self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
+
+    def get_fm(self):
+        return self.fm
+
+    def set_fm(self, fm):
+        self.fm = fm
+        self.analog_sig_source_x_0.set_frequency(self.fm)
 
 
 
